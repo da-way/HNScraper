@@ -10,7 +10,8 @@ points_parent = soup.select('.subtext')
 
 def manipulation(nl):
     sort_list = sorted(nl, key=lambda k: int(k['points'][:k['points'].index(" ")]), reverse=True)
-    return sort_list
+    filter_list = list(filter(lambda f: int(f['points'][:f['points'].index(" ")]) > 100, sort_list))
+    return filter_list
 
 def points_list(pl):
     new_pl = []
