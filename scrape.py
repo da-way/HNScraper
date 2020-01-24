@@ -4,13 +4,37 @@ from bs4 import BeautifulSoup as bs
 # Setup
 res = req.get('https://news.ycombinator.com/news')
 soup = bs(res.text, 'html.parser')
-links = soup.select('.storylink')
-st = soup.select('.subtext')
-for s in st:
-    ws = s.text.index(" ")
-    new = int(s.text[1:ws]) if s.find('span', class_="score") else "NONE"
-    print(new)
-    # new.append(s.text[1:ws] if s.get_text())
+links_parent = soup.select('.storylink')
+points_parent = soup.select('.subtext')
 
-# print(f'Links has {len(links)} & Subtext has {len(st)}')
-# print(new)
+
+def manipulation(nl):
+    sort_list = sorted(nl, key=lambda k: int(k['points'][:k['points'].index(" ")]), reverse=True)
+    return sort_list
+
+def points_list(pl):
+    new_pl = []
+    for p in pl:
+        ws_pos = p.text.index(" ")
+        ele = p.text[1:ws_pos] + ' points' if p.find('span', class_="score") else '0 points'
+        new_pl.append(ele)
+    return new_pl
+
+
+def create_custom_hn(lp,pp):
+    custom_hn = []
+    new_points_list = points_list(pp)
+    titles = [t.text for t in lp]
+    links = [l.get('href') for l in lp]
+    for idx, item in enumerate(titles):
+        something = {
+            "title": titles[idx],
+            "link": links[idx],
+            "points": new_points_list[idx]
+        }
+        custom_hn.append(something)
+    return manipulation(custom_hn)
+
+
+print(create_custom_hn(links_parent, points_parent))
+
